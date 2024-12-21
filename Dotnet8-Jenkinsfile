@@ -1,0 +1,31 @@
+pipeline {
+    agent { label 'node1' }
+	parameters {
+    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'BRANCH', type: 'PT_BRANCH'
+  }
+
+    stages {
+        stage('CleanWS') {
+            steps {
+                sh "rm -rf /home/ubuntu/workspace/Dotnet/dotnet8/*"
+                echo "This is ${params.BRANCH} branch"
+            }
+        }
+		stage('CloneRepo') {
+            steps {
+                 git branch: "${params.BRANCH}", url: 'https://github.com/mridulsingh8390/dotnet8.git'
+            }
+        }
+		stage('BuildApp') {
+            steps {
+                sh 'dotnet publish -p:EngageEnvironment="linux" HelloWorldApp.sln -c Release -f net8.0 --no-self-contained -o HelloWorldApp'
+                sh 'zip -r HelloWorldApp.zip HelloWorldApp/*'
+            }
+        }
+		stage('StashArtifacts') {
+            steps {
+               sh "aws s3 cp  HelloWorldApp.zip s3://mydemobucket1012025/${env.JOB_NAME}/${env.BUILD_NUMBER}/"
+            }
+        }
+    }
+}
