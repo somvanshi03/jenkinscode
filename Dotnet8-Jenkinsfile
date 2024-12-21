@@ -1,19 +1,14 @@
 pipeline {
     agent { label 'node1' }
-	parameters {
-    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'BRANCH', type: 'PT_BRANCH'
-  }
-
     stages {
         stage('CleanWS') {
             steps {
                 sh "rm -rf /home/ubuntu/workspace/Dotnet/dotnet8/*"
-                echo "This is ${params.BRANCH} branch"
             }
         }
 		stage('CloneRepo') {
             steps {
-                 git branch: "${params.BRANCH}", url: 'https://github.com/mridulsingh8390/dotnet8.git'
+                 git url: 'https://github.com/mridulsingh8390/dotnet8.git',branch: 'master'
             }
         }
 		stage('BuildApp') {
