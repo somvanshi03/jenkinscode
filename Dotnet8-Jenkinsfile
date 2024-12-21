@@ -1,5 +1,12 @@
 pipeline {
     agent { label 'node1' }
+    
+    options {
+  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
+  disableConcurrentBuilds()
+   timestamps()
+}
+
     stages {
         stage('CleanWS') {
             steps {
